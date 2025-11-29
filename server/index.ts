@@ -69,5 +69,24 @@ export function createServer() {
   // Contact and utility routes
   app.post("/api/contact", handleContactForm);
 
+  // Error handling middleware - must be last
+  app.use((req, res, next) => {
+    res.status(404).json({
+      success: false,
+      message: `Route not found: ${req.method} ${req.path}`,
+      error: "The requested API endpoint does not exist",
+    });
+  });
+
+  // Global error handler
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error("Server error:", err);
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message || "Internal server error",
+      error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    });
+  });
+
   return app;
 }
