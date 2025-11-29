@@ -49,10 +49,15 @@ export default function DoctorLogin() {
         data = JSON.parse(responseText);
       } catch (parseError) {
         console.error("Failed to parse JSON response:", responseText.substring(0, 200));
-        throw new Error(`Server error: Invalid response format. Please check if the server is running correctly. Status: ${response.status}`);
+        console.error("Response status:", response.status);
+        throw new Error(`Server error: Invalid response format. Response: ${responseText.substring(0, 100)}`);
       }
 
-      if (!response.ok || !data.success) {
+      if (!response.ok) {
+        throw new Error(data?.message || `Server error (${response.status}): ${responseText.substring(0, 100)}`);
+      }
+
+      if (!data.success) {
         throw new Error(data.message || "Login failed");
       }
 
