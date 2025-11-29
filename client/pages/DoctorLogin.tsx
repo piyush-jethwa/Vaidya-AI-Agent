@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { LoginRequest, LoginResponse } from "@shared/api";
 
 export default function DoctorLogin() {
   const [formData, setFormData] = useState({
@@ -11,13 +13,57 @@ export default function DoctorLogin() {
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle doctor login logic here
-    console.log("Doctor login:", formData);
-    // Navigate to doctor dashboard
-    window.location.href = "/doctor/dashboard";
+    setIsLoading(true);
+
+    try {
+      const loginRequest: LoginRequest = {
+        email: formData.email,
+        password: formData.password,
+        role: "doctor",
+      };
+
+      const response = await fetch("/api/auth/login/doctor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginRequest),
+      });
+
+      const data: LoginResponse = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store token and user info
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user_role", "doctor");
+
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${data.user.name}!`,
+      });
+
+      // Navigate to doctor dashboard
+      navigate("/doctor/dashboard");
+    } catch (error) {
+      console.error("Doctor login error:", error);
+      toast({
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "Invalid email or password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -90,8 +136,15 @@ export default function DoctorLogin() {
                 </a>
               </div>
 
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                Sign In to Dashboard
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign In to Dashboard"
+                )}
               </Button>
             </form>
 
