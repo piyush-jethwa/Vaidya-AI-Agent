@@ -28,15 +28,29 @@ export default function DoctorLogin() {
         role: "doctor",
       };
 
-      const response = await fetch("/api/auth/login/doctor", {
+      let response: Response;
+      try {
+        response = await fetch("/api/auth/login/doctor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(loginRequest),
-      });
+        });
+      } catch (fetchError) {
+        throw new Error("Unable to connect to server. Please make sure the server is running.");
+      }
 
-      const data: LoginResponse = await response.json();
+      // Read response as text first to handle both JSON and non-JSON responses
+      const responseText = await response.text();
+      let data: LoginResponse;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Failed to parse JSON response:", responseText.substring(0, 200));
+        throw new Error(`Server error: Invalid response format. Please check if the server is running correctly. Status: ${response.status}`);
+      }
 
       if (!response.ok || !data.success) {
         throw new Error(data.message || "Login failed");
@@ -56,9 +70,18 @@ export default function DoctorLogin() {
       navigate("/doctor/dashboard");
     } catch (error) {
       console.error("Doctor login error:", error);
+      
+      let errorMessage = "Invalid email or password. Please try again.";
+      
+      if (error instanceof SyntaxError) {
+        errorMessage = "Server response error. Please check if the server is running.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Login Failed",
-        description: error instanceof Error ? error.message : "Invalid email or password. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
