@@ -31,7 +31,6 @@ import {
   CheckCircle,
   Bot,
   Brain,
-  Building2,
 } from "lucide-react";
 
 export default function Index() {
@@ -137,12 +136,6 @@ export default function Index() {
               </a>
             </div>
             <div className="flex space-x-2">
-              <Link to="/hospital-command-center">
-                <Button variant="outline" size="sm" className="border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white">
-                  <Building2 className="h-4 w-4 mr-1" />
-                  Hospital Command Center
-                </Button>
-              </Link>
               <Link to="/doctor/login">
                 <Button variant="outline" size="sm">
                   Doctor Login
@@ -190,12 +183,12 @@ export default function Index() {
                     Book Appointment
                   </Button>
                 </Link>
-                <a href="https://ai-chatbot-personal.streamlit.app/" target="_blank" rel="noopener noreferrer">
+                <a href="https://vaidya-ai-1.streamlit.app/" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline">
                     Check Symptoms
                   </Button>
                 </a>
-                <a href="https://medcare-1.streamlit.app/" target="_blank" rel="noopener noreferrer">
+                <a href="https://e1290a080e0a24c7b1.gradio.live/" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
                     Check Report/X-ray
                   </Button>
@@ -238,7 +231,7 @@ export default function Index() {
                       <span className="text-gray-700">Book Appointment</span>
                     </div>
                   </Link>
-                  <a href="https://ai-chatbot-personal.streamlit.app/" target="_blank" rel="noopener noreferrer">
+                  <a href="https://vaidya-ai-1.streamlit.app/" target="_blank" rel="noopener noreferrer">
                     <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
                       <ClipboardList className="h-6 w-6 text-green-600" />
                       <span className="text-gray-700">Check Symptoms</span>
