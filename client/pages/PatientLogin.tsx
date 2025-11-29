@@ -36,10 +36,14 @@ export default function PatientLogin() {
 
     try {
       // For now, backend only supports email login. Phone login will need backend support.
-      const email = loginType === "email" ? loginData.email : "";
+      if (loginType === "phone") {
+        throw new Error("Phone login is not available yet. Please use email login.");
+      }
+      
+      const email = loginData.email;
       
       if (!email) {
-        throw new Error("Email login is required. Phone login coming soon!");
+        throw new Error("Email is required");
       }
 
       const loginRequest: LoginRequest = {
@@ -48,15 +52,29 @@ export default function PatientLogin() {
         role: "patient",
       };
 
-      const response = await fetch("/api/auth/login/patient", {
+      let response: Response;
+      try {
+        response = await fetch("/api/auth/login/patient", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(loginRequest),
-      });
+        });
+      } catch (fetchError) {
+        throw new Error("Unable to connect to server. Please make sure the server is running.");
+      }
 
-      const data: LoginResponse = await response.json();
+      // Read response as text first to handle both JSON and non-JSON responses
+      const responseText = await response.text();
+      let data: LoginResponse;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Failed to parse JSON response:", responseText.substring(0, 200));
+        throw new Error(`Server error: Invalid response format. Please check if the server is running correctly. Status: ${response.status}`);
+      }
 
       if (!response.ok || !data.success) {
         throw new Error(data.message || "Login failed");
@@ -76,9 +94,18 @@ export default function PatientLogin() {
       navigate("/patient/dashboard");
     } catch (error) {
       console.error("Patient login error:", error);
+      
+      let errorMessage = "Invalid credentials. Please try again.";
+      
+      if (error instanceof SyntaxError) {
+        errorMessage = "Server response error. Please check if the server is running.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Login Failed",
-        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -119,15 +146,29 @@ export default function PatientLogin() {
         gender: signupData.gender as 'male' | 'female' | 'other' | 'prefer-not-to-say',
       };
 
-      const response = await fetch("/api/auth/register/patient", {
+      let response: Response;
+      try {
+        response = await fetch("/api/auth/register/patient", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(registerRequest),
-      });
+        });
+      } catch (fetchError) {
+        throw new Error("Unable to connect to server. Please make sure the server is running.");
+      }
 
-      const data: RegisterPatientResponse = await response.json();
+      // Read response as text first to handle both JSON and non-JSON responses
+      const responseText = await response.text();
+      let data: RegisterPatientResponse;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Failed to parse JSON response:", responseText.substring(0, 200));
+        throw new Error(`Server error: Invalid response format. Please check if the server is running correctly. Status: ${response.status}`);
+      }
 
       if (!response.ok || !data.success) {
         throw new Error(data.message || "Registration failed");
@@ -147,9 +188,18 @@ export default function PatientLogin() {
       navigate("/patient/dashboard");
     } catch (error) {
       console.error("Patient signup error:", error);
+      
+      let errorMessage = "Registration failed. Please try again.";
+      
+      if (error instanceof SyntaxError) {
+        errorMessage = "Server response error. Please check if the server is running.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Registration Failed",
-        description: error instanceof Error ? error.message : "Registration failed. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -232,7 +282,7 @@ export default function PatientLogin() {
                   ) : (
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
+                        Phone Number (Coming Soon)
                       </label>
                       <Input
                         id="phone"
@@ -240,8 +290,9 @@ export default function PatientLogin() {
                         placeholder="+1 (555) 123-4567"
                         value={loginData.phone}
                         onChange={(e) => setLoginData({...loginData, phone: e.target.value})}
-                        required
+                        disabled
                       />
+                      <p className="text-xs text-gray-500 mt-1">Phone login is not available yet. Please use email login.</p>
                     </div>
                   )}
                   
