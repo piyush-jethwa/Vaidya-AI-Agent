@@ -81,7 +81,11 @@ export default function PatientDashboard() {
   };
 
   const handleLogout = () => {
-    // In real app, clear authentication tokens
+    // Clear authentication tokens and user data
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("user_role");
+    // Navigate to login page
     navigate("/patient/login");
   };
 
@@ -267,7 +271,7 @@ export default function PatientDashboard() {
             </Card>
           </Link>
 
-          <Link to="/symptom-checker">
+          <a href="https://ai-chatbot-personal.streamlit.app/" target="_blank" rel="noopener noreferrer">
             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardContent className="flex items-center p-6">
                 <div className="bg-blue-100 p-3 rounded-lg mr-4">
