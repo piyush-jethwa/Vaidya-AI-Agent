@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Eye, EyeOff, User, Phone, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Heart, Eye, EyeOff, User, Phone, Mail, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { LoginRequest, LoginResponse, RegisterPatientRequest, RegisterPatientResponse } from "@shared/api";
 
 export default function PatientLogin() {
   const [loginData, setLoginData] = useState({
@@ -23,25 +25,136 @@ export default function PatientLogin() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<"email" | "phone">("email");
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [isSignupLoading, setIsSignupLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle patient login logic here
-    console.log("Patient login:", loginData);
-    // Navigate to patient dashboard
-    window.location.href = "/patient/dashboard";
+    setIsLoginLoading(true);
+
+    try {
+      // For now, backend only supports email login. Phone login will need backend support.
+      const email = loginType === "email" ? loginData.email : "";
+      
+      if (!email) {
+        throw new Error("Email login is required. Phone login coming soon!");
+      }
+
+      const loginRequest: LoginRequest = {
+        email: email,
+        password: loginData.password,
+        role: "patient",
+      };
+
+      const response = await fetch("/api/auth/login/patient", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginRequest),
+      });
+
+      const data: LoginResponse = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store token and user info
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user_role", "patient");
+
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${data.user.name}!`,
+      });
+
+      // Navigate to patient dashboard
+      navigate("/patient/dashboard");
+    } catch (error) {
+      console.error("Patient login error:", error);
+      toast({
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoginLoading(false);
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (signupData.password !== signupData.confirmPassword) {
-      alert("Passwords don't match!");
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords don't match. Please try again.",
+        variant: "destructive",
+      });
       return;
     }
-    // Handle patient signup logic here
-    console.log("Patient signup:", signupData);
-    // Navigate to patient dashboard
-    window.location.href = "/patient/dashboard";
+
+    if (parseInt(signupData.age) < 1 || parseInt(signupData.age) > 120) {
+      toast({
+        title: "Invalid Age",
+        description: "Please enter a valid age.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSignupLoading(true);
+
+    try {
+      const registerRequest: RegisterPatientRequest = {
+        name: signupData.name,
+        email: signupData.email,
+        phone: signupData.phone,
+        password: signupData.password,
+        age: parseInt(signupData.age),
+        gender: signupData.gender as 'male' | 'female' | 'other' | 'prefer-not-to-say',
+      };
+
+      const response = await fetch("/api/auth/register/patient", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerRequest),
+      });
+
+      const data: RegisterPatientResponse = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      // Store token and user info
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user_role", "patient");
+
+      toast({
+        title: "Registration Successful",
+        description: `Welcome to VAIDYA AI, ${data.user.name}!`,
+      });
+
+      // Navigate to patient dashboard
+      navigate("/patient/dashboard");
+    } catch (error) {
+      console.error("Patient signup error:", error);
+      toast({
+        title: "Registration Failed",
+        description: error instanceof Error ? error.message : "Registration failed. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSignupLoading(false);
+    }
   };
 
   return (
@@ -165,8 +278,15 @@ export default function PatientLogin() {
                     </a>
                   </div>
 
-                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
-                    Sign In
+                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoginLoading}>
+                    {isLoginLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign In"
+                    )}
                   </Button>
                 </form>
               </TabsContent>
@@ -296,8 +416,15 @@ export default function PatientLogin() {
                     </span>
                   </div>
 
-                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
-                    Create Account
+                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isSignupLoading}>
+                    {isSignupLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
                 </form>
               </TabsContent>
