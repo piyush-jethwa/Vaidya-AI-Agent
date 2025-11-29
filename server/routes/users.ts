@@ -133,10 +133,26 @@ export const loginDoctor: RequestHandler = (req, res) => {
   try {
     const { email, password } = req.body as LoginRequest;
 
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      } as LoginResponse);
+    }
+
     // Simple validation (in production, use proper password hashing)
     const doctor = doctors.find((d) => d.email === email);
 
     if (!doctor) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      } as LoginResponse);
+    }
+
+    // For demo: accept any non-empty password (in production, use proper password hashing)
+    if (!password || password.trim().length === 0) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -166,10 +182,26 @@ export const loginPatient: RequestHandler = (req, res) => {
   try {
     const { email, password } = req.body as LoginRequest;
 
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      } as LoginResponse);
+    }
+
     // Simple validation (in production, use proper password hashing)
     const patient = patients.find((p) => p.email === email);
 
     if (!patient) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      } as LoginResponse);
+    }
+
+    // For demo: accept any non-empty password (in production, use proper password hashing)
+    if (!password || password.trim().length === 0) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
