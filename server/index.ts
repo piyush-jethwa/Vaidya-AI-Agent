@@ -69,29 +69,20 @@ export function createServer() {
   // Contact and utility routes
   app.post("/api/contact", handleContactForm);
 
-  // 404 handler - must be after all routes
-  app.use((req, res) => {
-    res.status(404).json({
-      success: false,
-      message: `Route not found: ${req.method} ${req.path}`,
-      error: "The requested API endpoint does not exist",
-    });
-  });
-
-  // Global error handler - must have 4 parameters and be last
-  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error("Server error:", err);
-    
-    // Don't send response if headers already sent
-    if (res.headersSent) {
-      return next(err);
+  // 404 handler - only for unmatched API routes
+  // For non-API routes, let Vite handle them (SPA routing)
+  app.use((req, res, next) => {
+    // Only handle API routes here, let Vite handle frontend routes
+    if (req.path.startsWith("/api/")) {
+      res.status(404).json({
+        success: false,
+        message: `Route not found: ${req.method} ${req.path}`,
+        error: "The requested API endpoint does not exist",
+      });
+    } else {
+      // Let Vite dev server handle frontend routes
+      next();
     }
-    
-    res.status(err.status || 500).json({
-      success: false,
-      message: err.message || "Internal server error",
-      error: process.env.NODE_ENV === "development" ? err.stack : undefined,
-    });
   });
 
   return app;
