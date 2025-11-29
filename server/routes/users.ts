@@ -107,8 +107,8 @@ const patients: Patient[] = [
 ];
 
 // Utility functions
-const generateId = () => Math.random().toString(36).substr(2, 9);
-const generateToken = () => Math.random().toString(36).substr(2, 20);
+const generateId = () => Math.random().toString(36).substring(2, 11);
+const generateToken = () => Math.random().toString(36).substring(2, 22);
 
 // Get all doctors
 export const getDoctors: RequestHandler = (req, res) => {
@@ -131,6 +131,7 @@ export const getDoctors: RequestHandler = (req, res) => {
 // Doctor login
 export const loginDoctor: RequestHandler = (req, res) => {
   try {
+    console.log("Doctor login request:", { email: req.body?.email, hasPassword: !!req.body?.password });
     const { email, password } = req.body as LoginRequest;
 
     // Basic validation
@@ -169,6 +170,7 @@ export const loginDoctor: RequestHandler = (req, res) => {
       message: "Login successful",
     } as LoginResponse);
   } catch (error) {
+    console.error("Doctor login error:", error);
     res.status(500).json({
       success: false,
       message: "Login failed",
@@ -180,6 +182,7 @@ export const loginDoctor: RequestHandler = (req, res) => {
 // Patient login
 export const loginPatient: RequestHandler = (req, res) => {
   try {
+    console.log("Patient login request:", { email: req.body?.email, hasPassword: !!req.body?.password });
     const { email, password } = req.body as LoginRequest;
 
     // Basic validation
@@ -218,6 +221,7 @@ export const loginPatient: RequestHandler = (req, res) => {
       message: "Login successful",
     } as LoginResponse);
   } catch (error) {
+    console.error("Patient login error:", error);
     res.status(500).json({
       success: false,
       message: "Login failed",
@@ -229,8 +233,43 @@ export const loginPatient: RequestHandler = (req, res) => {
 // Register patient
 export const registerPatient: RequestHandler = (req, res) => {
   try {
+    console.log("Patient registration request:", { email: req.body?.email, name: req.body?.name });
     const { name, email, phone, password, age, gender } =
       req.body as RegisterPatientRequest;
+
+    // Validate required fields
+    if (!name || !email || !phone || !password || !age || !gender) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      } as RegisterPatientResponse);
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      } as RegisterPatientResponse);
+    }
+
+    // Validate age
+    if (typeof age !== 'number' || age < 1 || age > 120) {
+      return res.status(400).json({
+        success: false,
+        message: "Age must be between 1 and 120",
+      } as RegisterPatientResponse);
+    }
+
+    // Validate gender
+    const validGenders = ['male', 'female', 'other', 'prefer-not-to-say'];
+    if (!validGenders.includes(gender)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid gender selection",
+      } as RegisterPatientResponse);
+    }
 
     // Check if email already exists
     const existingPatient = patients.find((p) => p.email === email);
@@ -266,6 +305,7 @@ export const registerPatient: RequestHandler = (req, res) => {
       message: "Registration successful",
     } as RegisterPatientResponse);
   } catch (error) {
+    console.error("Patient registration error:", error);
     res.status(500).json({
       success: false,
       message: "Registration failed",
