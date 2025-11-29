@@ -190,7 +190,7 @@ export default function Index() {
                     Book Appointment
                   </Button>
                 </Link>
-                <a href="https://vaidya-ai-1.streamlit.app/" target="_blank" rel="noopener noreferrer">
+                <a href="https://ai-chatbot-personal.streamlit.app/" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline">
                     Check Symptoms
                   </Button>
@@ -238,7 +238,7 @@ export default function Index() {
                       <span className="text-gray-700">Book Appointment</span>
                     </div>
                   </Link>
-                  <a href="https://vaidya-ai-1.streamlit.app/" target="_blank" rel="noopener noreferrer">
+                  <a href="https://ai-chatbot-personal.streamlit.app/" target="_blank" rel="noopener noreferrer">
                     <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
                       <ClipboardList className="h-6 w-6 text-green-600" />
                       <span className="text-gray-700">Check Symptoms</span>
