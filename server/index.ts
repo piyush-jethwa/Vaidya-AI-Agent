@@ -69,8 +69,8 @@ export function createServer() {
   // Contact and utility routes
   app.post("/api/contact", handleContactForm);
 
-  // Error handling middleware - must be last
-  app.use((req, res, next) => {
+  // 404 handler - must be after all routes
+  app.use((req, res) => {
     res.status(404).json({
       success: false,
       message: `Route not found: ${req.method} ${req.path}`,
@@ -78,9 +78,15 @@ export function createServer() {
     });
   });
 
-  // Global error handler
+  // Global error handler - must have 4 parameters and be last
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error("Server error:", err);
+    
+    // Don't send response if headers already sent
+    if (res.headersSent) {
+      return next(err);
+    }
+    
     res.status(err.status || 500).json({
       success: false,
       message: err.message || "Internal server error",
