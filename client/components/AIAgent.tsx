@@ -50,7 +50,7 @@ export default function AIAgent() {
           },
           {
             label: "🩺 Check Symptoms",
-            action: () => navigate("/symptom-checker"),
+            action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
           },
           { label: "👨‍⚕️ Find Doctors", action: () => handleFindDoctors() },
           { label: "💡 Health Tips", action: () => handleHealthTips() },
@@ -140,7 +140,7 @@ export default function AIAgent() {
         [
           {
             label: "🔍 Check Symptoms",
-            action: () => navigate("/symptom-checker"),
+            action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
           },
           { label: "🚨 Emergency?", action: () => handleEmergencyCheck() },
           { label: "💊 Common Issues", action: () => handleCommonSymptoms() },
@@ -191,7 +191,7 @@ export default function AIAgent() {
         { label: "🚀 Quick Book", action: () => navigate("/book-appointment") },
         {
           label: "🔥 Fast Symptoms",
-          action: () => navigate("/symptom-checker"),
+          action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
         },
         { label: "⭐ Express Help", action: () => handleExpressHelp() },
       ]);
@@ -209,7 +209,7 @@ export default function AIAgent() {
           },
           {
             label: "🔍 Analyze Symptoms",
-            action: () => navigate("/symptom-checker"),
+            action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
           },
           { label: "🏥 Find Doctors", action: () => handleFindDoctors() },
           { label: "🎯 Smart Help", action: () => handleSmartHelp() },
@@ -226,7 +226,7 @@ export default function AIAgent() {
           },
           {
             label: "🩺 Check Symptoms",
-            action: () => navigate("/symptom-checker"),
+            action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
           },
           { label: "🏠 Main Menu", action: () => navigate("/") },
           { label: "🔄 Try Again", action: () => setInputText("") },
@@ -293,7 +293,7 @@ export default function AIAgent() {
     const randomTip = tips[Math.floor(Math.random() * tips.length)];
     addAIMessage(`✨ Quick health boost: ${randomTip}`, [
       { label: "💡 More Tips", action: () => handleHealthTips() },
-      { label: "🩺 Check Health", action: () => navigate("/symptom-checker") },
+      { label: "🩺 Check Health", action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer") },
     ]);
   };
 
@@ -304,7 +304,7 @@ export default function AIAgent() {
         { label: "🏥 Find Urgent Care", action: () => handleUrgentCare() },
         {
           label: "🔍 Quick Symptoms",
-          action: () => navigate("/symptom-checker"),
+          action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
         },
         { label: "📞 Emergency Info", action: () => handleEmergencyInfo() },
       ],
@@ -357,7 +357,7 @@ export default function AIAgent() {
   const handleCommonSymptoms = () => {
     addAIMessage(
       "💊 Common issues I help with: headaches, fever, cough, stomach pain, fatigue. What's bothering you?",
-      [{ label: "🔍 Analyze Now", action: () => navigate("/symptom-checker") }],
+      [{ label: "🔍 Analyze Now", action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer") }],
     );
   };
 
@@ -366,7 +366,7 @@ export default function AIAgent() {
       "🚀 Express services: 2-min booking, instant symptom check, immediate doctor info!",
       [
         { label: "⚡ Book Fast", action: () => navigate("/book-appointment") },
-        { label: "🔥 Quick Check", action: () => navigate("/symptom-checker") },
+        { label: "🔥 Quick Check", action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer") },
       ],
     );
   };
@@ -377,7 +377,7 @@ export default function AIAgent() {
       [
         {
           label: "🧠 Try AI Symptoms",
-          action: () => navigate("/symptom-checker"),
+          action: () => window.open("https://ai-chatbot-personal.streamlit.app/", "_blank", "noopener,noreferrer"),
         },
         {
           label: "🎯 Smart Booking",
