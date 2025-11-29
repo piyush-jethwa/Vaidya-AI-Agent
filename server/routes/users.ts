@@ -367,3 +367,4 @@ export const getDoctorProfile: RequestHandler = (req, res) => {
     } as ApiResponse);
   }
 };
+
